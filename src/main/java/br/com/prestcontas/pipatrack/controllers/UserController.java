@@ -33,9 +33,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
-        userService.register(dto);
+    @PreAuthorize("hasAuthority('SCOPE_admin', 'SCOPE_manager')")
+    public ResponseEntity<Void> register(
+        @Valid @RequestBody RegisterRequestDTO dto, 
+        JwtAuthenticationToken token
+    ) {
+        userService.register(dto, token);
         return ResponseEntity.ok().build();
     }
 
@@ -53,7 +56,10 @@ public class UserController {
 
     @PatchMapping("/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> updateUser(@PathVariable("id") UUID userId, @Valid @RequestBody UserUpdateDTO dto){
+    public ResponseEntity<Void> updateUser(
+        @PathVariable("id") UUID userId, 
+        @Valid @RequestBody UserUpdateDTO dto
+    ){
         userService.updateUser(userId, dto);
         return ResponseEntity.ok().build();
     }

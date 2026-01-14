@@ -10,11 +10,11 @@ import br.com.prestcontas.pipatrack.entities.Town;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
-public interface TownshipRepository extends JpaRepository<Town, UUID>{
+public interface TownRepository extends JpaRepository<Town, UUID>{
 
     Optional<Town> findByName(String name);
 
-    Optional<Town> findByTownId(UUID townshipId);
+    Optional<Town> findByTownId(UUID townId);
 
 }
 

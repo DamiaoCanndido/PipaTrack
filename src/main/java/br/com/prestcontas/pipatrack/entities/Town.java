@@ -51,7 +51,7 @@ public class Town {
         return townId;
     }
 
-    public void setTownshipId(UUID townId) {
+    public void setTownId(UUID townId) {
         this.townId = townId;
     }
 

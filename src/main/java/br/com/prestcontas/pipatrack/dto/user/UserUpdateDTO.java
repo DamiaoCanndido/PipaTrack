@@ -29,5 +29,5 @@ public record UserUpdateDTO(
     @Size(min = 6, message = "Password must have at least 6 characters")
     String confirmPassword,
 
-    UUID townshipId
+    UUID townId
 ) implements PasswordConfirmable { }

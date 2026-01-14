@@ -22,7 +22,7 @@ public record RegisterRequestDTO(
 
     @Enumerated(EnumType.STRING)
     @NotBlank(message = "Role is required")
-    RoleEnum name,
+    RoleEnum role,
     
     @Size(min = 6, message = "Password must have at least 6 characters")
     @NotBlank(message = "Password is required")
@@ -31,5 +31,5 @@ public record RegisterRequestDTO(
     @NotBlank(message = "Confirm password is required")
     String confirmPassword,
 
-    UUID townshipId
+    UUID townId
 ) implements PasswordConfirmable {}

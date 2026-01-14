@@ -31,7 +31,7 @@ import br.com.prestcontas.pipatrack.exception.ForbiddenException;
 import br.com.prestcontas.pipatrack.exception.NotFoundException;
 import br.com.prestcontas.pipatrack.exception.UnprocessableContentException;
 import br.com.prestcontas.pipatrack.repositories.RoleRepository;
-import br.com.prestcontas.pipatrack.repositories.TownshipRepository;
+import br.com.prestcontas.pipatrack.repositories.TownRepository;
 import br.com.prestcontas.pipatrack.repositories.UserRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -41,39 +41,39 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final TownshipRepository townshipRepository;
+    private final TownRepository townRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
 
     public UserService(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            TownshipRepository townshipRepository,
+            TownRepository townRepository,
             BCryptPasswordEncoder passwordEncoder,
             JwtEncoder jwtEncoder) {
 
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        this.townshipRepository = townshipRepository;
+        this.townRepository = townRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtEncoder = jwtEncoder;
     }
 
     @Transactional
-    public void register(RegisterRequestDTO dto) {
+    public void register(RegisterRequestDTO dto, JwtAuthenticationToken token) {
 
         if (userRepository.findByEmail(dto.email()).isPresent() || 
             userRepository.findByUsername(dto.username()).isPresent()) {
             throw new UnprocessableContentException("user already exists");
         }
 
-        var basicRole = roleRepository.findByName(RoleEnum.manager);
+        var newRole = roleRepository.findByName(dto.role());
 
         Town town = null;
 
-        if (dto.townshipId() != null) {
-            town = townshipRepository.findByTownId(dto.townshipId()).orElseThrow(
-                () -> new NotFoundException("Township not found")
+        if (dto.townId() != null) {
+            town = townRepository.findByTownId(dto.townId()).orElseThrow(
+                () -> new NotFoundException("Town not found")
             );    
         }
 
@@ -81,7 +81,7 @@ public class UserService {
         user.setUsername(dto.username());
         user.setEmail(dto.email());
         user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setRoles(Set.of(basicRole));
+        user.setRoles(Set.of(newRole));
         user.setTown(town);
 
         userRepository.save(user);
@@ -109,7 +109,7 @@ public class UserService {
 
 
         var claims = JwtClaimsSet.builder()
-            .issuer("nergal.com")
+            .issuer("prestcontas.com.br")
             .subject(user.get().getUserId().toString())
             .expiresAt(now.plusSeconds(expiresIn))
             .claim("scope", scopes)
@@ -172,10 +172,10 @@ public class UserService {
         if (dto.password() != null && !dto.password().isEmpty()) {
             entity.setPassword(passwordEncoder.encode(dto.password()));
         }
-        if (dto.townshipId() != null) {
-            var township = townshipRepository.findByTownId(dto.townshipId())
-                .orElseThrow(() -> new NotFoundException("Township not found"));
-            entity.setTown(township);
+        if (dto.townId() != null) {
+            var town = townRepository.findByTownId(dto.townId())
+                .orElseThrow(() -> new NotFoundException("Town not found"));
+            entity.setTown(town);
         }
     }
 
@@ -191,9 +191,9 @@ public class UserService {
 
     @Transactional
     public void deleteUser(UUID userId, JwtAuthenticationToken token){
-        var user = userRepository.findById(UUID.fromString(token.getName()));
+        var user = getMe(token);
 
-        var isAdmin = user.get().getRoles()
+        var isAdmin = user.getRoles()
             .stream()
             .anyMatch(
                 role -> role.getName().name().equalsIgnoreCase(
@@ -209,5 +209,12 @@ public class UserService {
         } else {
             throw new ForbiddenException("You do not have permission to delete this user.");
         }
+    }
+
+    private User getMe(JwtAuthenticationToken token) {
+        return userRepository.findById(UUID.fromString(token.getName()))
+            .orElseThrow(
+                () -> new NotFoundException("User not found")
+            );
     }
 }

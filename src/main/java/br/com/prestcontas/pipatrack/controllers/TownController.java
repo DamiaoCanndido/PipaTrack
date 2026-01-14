@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.prestcontas.pipatrack.dto.town.TownResponseDTO;
 import br.com.prestcontas.pipatrack.dto.town.TownRequestDTO;
 import br.com.prestcontas.pipatrack.dto.town.TownUpdateDTO;
-import br.com.prestcontas.pipatrack.services.TownshipService;
+import br.com.prestcontas.pipatrack.services.TownService;
 
 import jakarta.validation.Valid;
 
@@ -25,40 +25,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/town")
-public class TownshipController {
+public class TownController {
 
-    private final TownshipService townshipService;
+    private final TownService townService;
 
-    public TownshipController(TownshipService townshipService) {
-        this.townshipService = townshipService;
+    public TownController(TownService townService) {
+        this.townService = townService;
     }
 
     @GetMapping("")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<TownResponseDTO> getTownships(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<TownResponseDTO> getTowns(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int pageSize) {
-        return ResponseEntity.ok(townshipService.getAllTownships(page, pageSize));
+        return ResponseEntity.ok(townService.getAllTowns(page, pageSize));
     }
     
 
     @PostMapping("")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
     public ResponseEntity<Void> createTown(@Valid @RequestBody TownRequestDTO dto) {
-        townshipService.createTownship(dto);
+        townService.createTown(dto);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
     public ResponseEntity<Void> updateTown(@PathVariable UUID id, @Valid @RequestBody TownUpdateDTO dto) {
-        townshipService.updateTownship(id, dto);
+        townService.updateTown(id, dto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
     public ResponseEntity<Void> deleteTown(@PathVariable UUID id) {
-        townshipService.deleteTownship(id);
+        townService.deleteTown(id);
         return ResponseEntity.ok().build();
     }
 }
