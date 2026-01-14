@@ -1,0 +1,90 @@
+package br.com.prestcontas.pipatrack.services;
+
+import org.springframework.data.domain.Sort;
+
+import java.util.UUID;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import br.com.prestcontas.pipatrack.dto.TownshipDTO;
+import br.com.prestcontas.pipatrack.dto.TownshipItemDTO;
+import br.com.prestcontas.pipatrack.dto.TownshipRequestDTO;
+import br.com.prestcontas.pipatrack.dto.UpdateTownshipDTO;
+import br.com.prestcontas.pipatrack.entities.Township;
+import br.com.prestcontas.pipatrack.exception.NotFoundException;
+import br.com.prestcontas.pipatrack.repositories.TownshipRepository;
+
+@Service
+public class TownshipService {
+
+    private final TownshipRepository townshipRepo;
+    
+    public TownshipService(TownshipRepository townshipRepo) {
+        this.townshipRepo = townshipRepo;
+    }
+
+    @Transactional(readOnly = true)
+    public TownshipDTO getAllTownships(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int pageSize) {
+        var pageable = PageRequest.of(page, pageSize, Sort.Direction.ASC, "name");
+        var townshipPage = townshipRepo.findAll(pageable);
+
+        var townshipItems = townshipPage.getContent().stream()
+            .map(township -> new TownshipItemDTO(
+                township.getTownshipId(),
+                township.getName(),
+                township.getUf(),
+                township.getImageUrl()
+            ))
+            .toList();
+        
+        return new TownshipDTO(
+            townshipItems,
+            townshipPage.getNumber(),
+            townshipPage.getSize(),
+            townshipPage.getTotalPages(),
+            townshipPage.getTotalElements()
+        );
+    }
+
+    @Transactional
+    public void createTownship(TownshipRequestDTO dto){
+        var township = new Township();
+        township.setName(dto.name());
+        township.setUf(dto.uf());
+        township.setImageUrl(dto.imageUrl());
+        townshipRepo.save(township);
+    }
+
+    protected void applyUpdates(UpdateTownshipDTO dto, Township township) {
+        if (dto.name() != null) {
+            township.setName(dto.name());
+        }
+        if (dto.uf() != null) {
+            township.setUf(dto.uf());
+        }
+        if (dto.imageUrl() != null) {
+            township.setImageUrl(dto.imageUrl());
+        }
+    }
+
+    @Transactional
+    public void updateTownship(UUID townshipId, UpdateTownshipDTO dto){
+        var township = townshipRepo.findById(townshipId)
+            .orElseThrow(() -> new NotFoundException("Township not found"));
+        
+        applyUpdates(dto, township);
+        townshipRepo.save(township);
+    }
+
+    @Transactional
+    public void deleteTownship(UUID townshipId){
+        townshipRepo.findById(townshipId)
+        .orElseThrow(() -> new NotFoundException(
+            "Township not found"
+        ));
+        townshipRepo.deleteById(townshipId);
+    }
+}

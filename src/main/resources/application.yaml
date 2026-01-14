@@ -1,0 +1,41 @@
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+  profiles:
+    active: dev
+  application:
+    name: pipatrack
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pipatrack
+    username: postgres
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    # properties:
+    #   hibernate:
+    #     dialect: org.hibernate.dialect.PostgreSQLDialect
+    #     format_sql: true
+
+jwt:
+  public:
+    key: classpath:app.pub
+  private:
+    key: classpath:app.key
+
+admin:
+  username: ${ADM_USERNAME}
+  email: ${ADM_EMAIL}
+  password: ${ADM_PASSWORD}
