@@ -23,6 +23,7 @@ import br.com.prestcontas.pipatrack.dto.TownshipItemDTO;
 import br.com.prestcontas.pipatrack.dto.UpdateUserDTO;
 import br.com.prestcontas.pipatrack.dto.UserDTO;
 import br.com.prestcontas.pipatrack.dto.UserItemDTO;
+import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
 import br.com.prestcontas.pipatrack.entities.Role;
 import br.com.prestcontas.pipatrack.entities.Township;
 import br.com.prestcontas.pipatrack.entities.User;
@@ -66,7 +67,7 @@ public class UserService {
             throw new UnprocessableContentException("user already exists");
         }
 
-        var basicRole = roleRepository.findByName(Role.Values.basic);
+        var basicRole = roleRepository.findByName(RoleEnum.manager);
 
         Township township = null;
 
@@ -100,7 +101,7 @@ public class UserService {
         var role = user.get().getRoles()
             .stream()
             .map(Role::getName)
-            .map(Role.Values::name)
+            .map(RoleEnum::name)
             .collect(Collectors.joining(" "));
         
         
@@ -192,7 +193,11 @@ public class UserService {
 
         var isAdmin = user.get().getRoles()
             .stream()
-            .anyMatch(role -> role.getName().name().equalsIgnoreCase(Role.Values.admin.name()));
+            .anyMatch(
+                role -> role.getName().name().equalsIgnoreCase(
+                    RoleEnum.admin.name()
+                )
+            );
 
         var userToDelete = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));

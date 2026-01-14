@@ -20,7 +20,7 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false)
-    private Values name;
+    private RoleEnum name;
 
     public Long getRoleId() {
         return roleId;
@@ -30,20 +30,21 @@ public class Role {
         this.roleId = roleId;
     }
 
-    public Values getName() {
+    public RoleEnum getName() {
         return name;
     }
 
-    public void setName(Values name) {
+    public void setName(RoleEnum name) {
         this.name = name;
     }
 
-    public enum Values {
-        basic(1L),
-        admin(2L);
+    public enum RoleEnum {
+        driver(1L),
+        manager(2L),
+        admin(3L);
         long roleId;
 
-        private Values(long roleId) {
+        private RoleEnum(long roleId) {
             this.roleId = roleId;
         }
 

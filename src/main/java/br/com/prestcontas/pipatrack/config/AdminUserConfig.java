@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.prestcontas.pipatrack.entities.Role;
+import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
 import br.com.prestcontas.pipatrack.entities.User;
 import br.com.prestcontas.pipatrack.repositories.RoleRepository;
 import br.com.prestcontas.pipatrack.repositories.UserRepository;
@@ -35,7 +35,7 @@ public class AdminUserConfig implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        var roleAdmin = roleRepository.findByName(Role.Values.admin);
+        var roleAdmin = roleRepository.findByName(RoleEnum.admin);
         var userAdmin = userRepository.findByEmail(adminEnvConfig.getEmail());
 
          userAdmin.ifPresentOrElse(

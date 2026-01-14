@@ -3,7 +3,7 @@ package br.com.prestcontas.pipatrack.dto;
 import java.util.UUID;
 
 import br.com.prestcontas.pipatrack.validators.PasswordMatches;
-import br.com.prestcontas.pipatrack.entities.Role;
+import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +20,7 @@ public record UpdateUserDTO(
     String email,
 
     @Enumerated(EnumType.STRING)
-    Role.Values role,
+    RoleEnum role,
 
     @Size(min = 6, message = "Password must have at least 6 characters")
     String password, 
