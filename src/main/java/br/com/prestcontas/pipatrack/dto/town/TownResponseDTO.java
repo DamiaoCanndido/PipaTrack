@@ -1,8 +1,8 @@
-package br.com.prestcontas.pipatrack.dto;
+package br.com.prestcontas.pipatrack.dto.town;
 
 import java.util.List;
 
-public record TownshipDTO(List<TownshipItemDTO> townships, 
+public record TownResponseDTO(List<TownItemDTO> townships, 
                           int page, 
                           int pageSize, 
                           int totalPages, 

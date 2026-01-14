@@ -16,13 +16,13 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-@Table(name = "tb_township")
-public class Township {
+@Table(name = "tb_town")
+public class Town {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "township_id")
-    private UUID townshipId;
+    @Column(name = "town_id")
+    private UUID townId;
 
     @Column(nullable = false)
     private String name;
@@ -41,18 +41,18 @@ public class Township {
     private String imageUrl;
 
     @OneToMany(
-        mappedBy = "township",
+        mappedBy = "town",
         cascade = CascadeType.REMOVE,
         orphanRemoval = true
     )
     private List<User> users;
 
-    public UUID getTownshipId() {
-        return townshipId;
+    public UUID getTownId() {
+        return townId;
     }
 
-    public void setTownshipId(UUID townshipId) {
-        this.townshipId = townshipId;
+    public void setTownshipId(UUID townId) {
+        this.townId = townId;
     }
 
     public String getName() {

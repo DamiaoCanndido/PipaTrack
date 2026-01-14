@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.prestcontas.pipatrack.dto.TownshipDTO;
-import br.com.prestcontas.pipatrack.dto.TownshipRequestDTO;
-import br.com.prestcontas.pipatrack.dto.UpdateTownshipDTO;
+import br.com.prestcontas.pipatrack.dto.town.TownResponseDTO;
+import br.com.prestcontas.pipatrack.dto.town.TownRequestDTO;
+import br.com.prestcontas.pipatrack.dto.town.TownUpdateDTO;
 import br.com.prestcontas.pipatrack.services.TownshipService;
 
 import jakarta.validation.Valid;
@@ -35,7 +35,7 @@ public class TownshipController {
 
     @GetMapping("")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<TownshipDTO> getTownships(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<TownResponseDTO> getTownships(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int pageSize) {
         return ResponseEntity.ok(townshipService.getAllTownships(page, pageSize));
     }
@@ -43,14 +43,14 @@ public class TownshipController {
 
     @PostMapping("")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> createTown(@Valid @RequestBody TownshipRequestDTO dto) {
+    public ResponseEntity<Void> createTown(@Valid @RequestBody TownRequestDTO dto) {
         townshipService.createTownship(dto);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> updateTown(@PathVariable UUID id, @Valid @RequestBody UpdateTownshipDTO dto) {
+    public ResponseEntity<Void> updateTown(@PathVariable UUID id, @Valid @RequestBody TownUpdateDTO dto) {
         townshipService.updateTownship(id, dto);
         return ResponseEntity.ok().build();
     }

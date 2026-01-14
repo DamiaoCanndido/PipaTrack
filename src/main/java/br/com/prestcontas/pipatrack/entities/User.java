@@ -8,8 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import br.com.prestcontas.pipatrack.dto.LoginRequest;
 
+import br.com.prestcontas.pipatrack.dto.user.LoginRequest;
 // javax not found
 import jakarta.persistence.*;
 
@@ -40,8 +40,8 @@ public class User {
     private Set<Role> roles;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "township_id")
-    private Township township;
+    @JoinColumn(name = "town_id")
+    private Town town;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -86,12 +86,12 @@ public class User {
         this.roles = roles;
     }
 
-    public Township getTownship() {
-        return township;
+    public Town getTown() {
+        return town;
     }
 
-    public void setTownship(Township township) {
-        this.township = township;
+    public void setTown(Town town) {
+        this.town = town;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -5,16 +5,16 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
-import br.com.prestcontas.pipatrack.entities.Township;
+import br.com.prestcontas.pipatrack.entities.Town;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 @Repository
-public interface TownshipRepository extends JpaRepository<Township, UUID>{
+public interface TownshipRepository extends JpaRepository<Town, UUID>{
 
-    Optional<Township> findByName(String name);
+    Optional<Town> findByName(String name);
 
-    Optional<Township> findByTownshipId(UUID townshipId);
+    Optional<Town> findByTownId(UUID townshipId);
 
 }
 

@@ -1,8 +1,9 @@
-package br.com.prestcontas.pipatrack.dto;
+package br.com.prestcontas.pipatrack.dto.user;
 
 import java.util.UUID;
 
 import br.com.prestcontas.pipatrack.validators.PasswordMatches;
+import br.com.prestcontas.pipatrack.dto.PasswordConfirmable;
 import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
 
 import jakarta.persistence.EnumType;
@@ -12,7 +13,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
 @PasswordMatches
-public record UpdateUserDTO(
+public record UserUpdateDTO(
     @Min(value = 3, message = "Username must be at least 3 characters long")
     String username, 
 

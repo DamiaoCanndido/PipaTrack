@@ -1,4 +1,4 @@
-package br.com.prestcontas.pipatrack.dto;
+package br.com.prestcontas.pipatrack.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -10,5 +10,6 @@ public record LoginRequest(
     String email, 
 
     @Size(min = 6, message = "Password must have at least 6 characters")
+    @NotBlank(message = "Password is required")
     String password
 ) {}

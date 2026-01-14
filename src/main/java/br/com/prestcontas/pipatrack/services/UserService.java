@@ -15,17 +15,17 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import br.com.prestcontas.pipatrack.dto.LoginRequest;
-import br.com.prestcontas.pipatrack.dto.LoginResponse;
-import br.com.prestcontas.pipatrack.dto.RegisterUserDTO;
-import br.com.prestcontas.pipatrack.dto.RoleItemDTO;
-import br.com.prestcontas.pipatrack.dto.TownshipItemDTO;
-import br.com.prestcontas.pipatrack.dto.UpdateUserDTO;
-import br.com.prestcontas.pipatrack.dto.UserDTO;
-import br.com.prestcontas.pipatrack.dto.UserItemDTO;
+import br.com.prestcontas.pipatrack.dto.role.RoleItemDTO;
+import br.com.prestcontas.pipatrack.dto.town.TownItemDTO;
+import br.com.prestcontas.pipatrack.dto.user.LoginRequest;
+import br.com.prestcontas.pipatrack.dto.user.LoginResponse;
+import br.com.prestcontas.pipatrack.dto.user.RegisterRequestDTO;
+import br.com.prestcontas.pipatrack.dto.user.UserUpdateDTO;
+import br.com.prestcontas.pipatrack.dto.user.UserResponseDTO;
+import br.com.prestcontas.pipatrack.dto.user.UserItemDTO;
 import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
 import br.com.prestcontas.pipatrack.entities.Role;
-import br.com.prestcontas.pipatrack.entities.Township;
+import br.com.prestcontas.pipatrack.entities.Town;
 import br.com.prestcontas.pipatrack.entities.User;
 import br.com.prestcontas.pipatrack.exception.ForbiddenException;
 import br.com.prestcontas.pipatrack.exception.NotFoundException;
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     @Transactional
-    public void register(RegisterUserDTO dto) {
+    public void register(RegisterRequestDTO dto) {
 
         if (userRepository.findByEmail(dto.email()).isPresent() || 
             userRepository.findByUsername(dto.username()).isPresent()) {
@@ -69,10 +69,10 @@ public class UserService {
 
         var basicRole = roleRepository.findByName(RoleEnum.manager);
 
-        Township township = null;
+        Town town = null;
 
         if (dto.townshipId() != null) {
-            township = townshipRepository.findByTownshipId(dto.townshipId()).orElseThrow(
+            town = townshipRepository.findByTownId(dto.townshipId()).orElseThrow(
                 () -> new NotFoundException("Township not found")
             );    
         }
@@ -82,7 +82,7 @@ public class UserService {
         user.setEmail(dto.email());
         user.setPassword(passwordEncoder.encode(dto.password()));
         user.setRoles(Set.of(basicRole));
-        user.setTownship(township);
+        user.setTown(town);
 
         userRepository.save(user);
     }
@@ -122,7 +122,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDTO listUsers(int page, int pageSize){
+    public UserResponseDTO listUsers(int page, int pageSize){
         var users = userRepository.findAll(PageRequest.of(page, pageSize, Sort.Direction.ASC, "username"))   
             .map(user -> 
                 new UserItemDTO(
@@ -135,16 +135,18 @@ public class UserService {
                             role.getRoleId(), 
                             role.getName()
                         )).collect(Collectors.toList()),
-                    user.getTownship() != null ? new TownshipItemDTO(
-                        user.getTownship().getTownshipId(),
-                        user.getTownship().getName(),
-                        user.getTownship().getUf(),
-                        user.getTownship().getImageUrl()
+                    user.getTown() != null ? new TownItemDTO(
+                        user.getTown().getTownId(),
+                        user.getTown().getName(),
+                        user.getTown().getUf(),
+                        user.getTown().getImageUrl(),
+                        user.getTown().getCnpj(),
+                        user.getTown().getCode()
                     ) : null,
                     user.getCreatedAt()
                 ));
 
-        return new UserDTO(
+        return new UserResponseDTO(
             users.getContent(),
             page,
             pageSize,
@@ -153,7 +155,7 @@ public class UserService {
         );
     }
 
-    protected void applyUpdates(User entity, UpdateUserDTO dto) {
+    protected void applyUpdates(User entity, UserUpdateDTO dto) {
         if (dto.username() != null) {
             entity.setUsername(dto.username());
         }
@@ -171,14 +173,14 @@ public class UserService {
             entity.setPassword(passwordEncoder.encode(dto.password()));
         }
         if (dto.townshipId() != null) {
-            var township = townshipRepository.findByTownshipId(dto.townshipId())
+            var township = townshipRepository.findByTownId(dto.townshipId())
                 .orElseThrow(() -> new NotFoundException("Township not found"));
-            entity.setTownship(township);
+            entity.setTown(township);
         }
     }
 
     @Transactional
-    public void updateUser(UUID userId, UpdateUserDTO dto){
+    public void updateUser(UUID userId, UserUpdateDTO dto){
         var user = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
 

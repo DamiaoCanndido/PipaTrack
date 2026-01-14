@@ -1,9 +1,13 @@
-package br.com.prestcontas.pipatrack.dto;
+package br.com.prestcontas.pipatrack.dto.town;
 
+import org.hibernate.validator.constraints.br.CNPJ;
+
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record UpdateTownshipDTO(
+public record TownUpdateDTO(
+    
     @Size(min = 3, message = "Name must be at least 3 characters long")
     String name, 
 
@@ -14,5 +18,11 @@ public record UpdateTownshipDTO(
         regexp = "^https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/.*)?$", 
         message = "The URL must be valid."
     )
-    String imageUrl
+    String imageUrl,
+
+    @CNPJ(message = "invalid format")
+    String cnpj,
+
+    @Min(value = 1, message = "code invalid")
+    Long code
 ) { }

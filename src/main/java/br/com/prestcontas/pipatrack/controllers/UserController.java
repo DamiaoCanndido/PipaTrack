@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.prestcontas.pipatrack.dto.LoginRequest;
-import br.com.prestcontas.pipatrack.dto.LoginResponse;
-import br.com.prestcontas.pipatrack.dto.RegisterUserDTO;
-import br.com.prestcontas.pipatrack.dto.UpdateUserDTO;
-import br.com.prestcontas.pipatrack.dto.UserDTO;
+import br.com.prestcontas.pipatrack.dto.user.LoginRequest;
+import br.com.prestcontas.pipatrack.dto.user.LoginResponse;
+import br.com.prestcontas.pipatrack.dto.user.RegisterRequestDTO;
+import br.com.prestcontas.pipatrack.dto.user.UserUpdateDTO;
+import br.com.prestcontas.pipatrack.dto.user.UserResponseDTO;
 import br.com.prestcontas.pipatrack.services.UserService;
 
 import jakarta.validation.Valid;
@@ -34,14 +34,14 @@ public class UserController {
 
     @PostMapping("/register")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterUserDTO dto) {
+    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequestDTO dto) {
         userService.register(dto);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/users")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<UserDTO> listUsers(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<UserResponseDTO> listUsers(@RequestParam(defaultValue = "0") int page,
                                            @RequestParam(defaultValue = "10") int pageSize) {
         return ResponseEntity.ok(userService.listUsers(page, pageSize));
     }
@@ -53,7 +53,7 @@ public class UserController {
 
     @PatchMapping("/user/{id}")
     @PreAuthorize("hasAuthority('SCOPE_admin')")
-    public ResponseEntity<Void> updateUser(@PathVariable("id") UUID userId, @Valid @RequestBody UpdateUserDTO dto){
+    public ResponseEntity<Void> updateUser(@PathVariable("id") UUID userId, @Valid @RequestBody UserUpdateDTO dto){
         userService.updateUser(userId, dto);
         return ResponseEntity.ok().build();
     }
