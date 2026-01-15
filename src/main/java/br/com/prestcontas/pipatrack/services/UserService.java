@@ -1,9 +1,7 @@
 package br.com.prestcontas.pipatrack.services;
 
 import java.time.Instant;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,7 +22,6 @@ import br.com.prestcontas.pipatrack.dto.user.UserUpdateDTO;
 import br.com.prestcontas.pipatrack.dto.user.UserResponseDTO;
 import br.com.prestcontas.pipatrack.dto.user.UserItemDTO;
 import br.com.prestcontas.pipatrack.entities.Role.RoleEnum;
-import br.com.prestcontas.pipatrack.entities.Role;
 import br.com.prestcontas.pipatrack.entities.Town;
 import br.com.prestcontas.pipatrack.entities.User;
 import br.com.prestcontas.pipatrack.exception.ForbiddenException;
@@ -81,7 +78,7 @@ public class UserService {
         user.setUsername(dto.username());
         user.setEmail(dto.email());
         user.setPassword(passwordEncoder.encode(dto.password()));
-        user.setRoles(Set.of(newRole));
+        user.setRole(newRole);
         user.setTown(town);
 
         userRepository.save(user);
@@ -98,21 +95,13 @@ public class UserService {
         var now = Instant.now();
         var expiresIn = 300L;
 
-        var role = user.get().getRoles()
-            .stream()
-            .map(Role::getName)
-            .map(RoleEnum::name)
-            .collect(Collectors.joining(" "));
-        
-        
-        var scopes = String.join(" ", role);
-
+        var role = user.get().getRole().getName();
 
         var claims = JwtClaimsSet.builder()
             .issuer("prestcontas.com.br")
             .subject(user.get().getUserId().toString())
             .expiresAt(now.plusSeconds(expiresIn))
-            .claim("scope", scopes)
+            .claim("scope", role.name())
             .issuedAt(now)
             .build();
 
@@ -129,12 +118,10 @@ public class UserService {
                     user.getUserId(),
                     user.getUsername(),
                     user.getEmail(),
-                    user.getRoles()
-                        .stream()
-                        .map(role -> new RoleItemDTO(
-                            role.getRoleId(), 
-                            role.getName()
-                        )).collect(Collectors.toList()),
+                    new RoleItemDTO(
+                        user.getRole().getRoleId(),
+                        user.getRole().getName()
+                    ),
                     user.getTown() != null ? new TownItemDTO(
                         user.getTown().getTownId(),
                         user.getTown().getName(),
@@ -167,7 +154,7 @@ public class UserService {
             if (role == null) {
                 throw new NotFoundException("Role not found");
             }
-            entity.setRoles(Set.of(role));
+            entity.setRole(role);
         }
         if (dto.password() != null && !dto.password().isEmpty()) {
             entity.setPassword(passwordEncoder.encode(dto.password()));
@@ -193,13 +180,7 @@ public class UserService {
     public void deleteUser(UUID userId, JwtAuthenticationToken token){
         var user = getMe(token);
 
-        var isAdmin = user.getRoles()
-            .stream()
-            .anyMatch(
-                role -> role.getName().name().equalsIgnoreCase(
-                    RoleEnum.admin.name()
-                )
-            );
+        var isAdmin = user.getRole().getName() == RoleEnum.admin;
 
         var userToDelete = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));

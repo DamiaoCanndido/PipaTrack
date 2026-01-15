@@ -1,7 +1,5 @@
 package br.com.prestcontas.pipatrack.config;
 
-import java.util.Set;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -47,7 +45,7 @@ public class AdminUserConfig implements CommandLineRunner {
                     user.setUsername(adminEnvConfig.getUsername());
                     user.setEmail(adminEnvConfig.getEmail());
                     user.setPassword(passwordEncoder.encode(adminEnvConfig.getPassword()));
-                    user.setRoles(Set.of(roleAdmin));
+                    user.setRole(roleAdmin);
                     userRepository.save(user);
                 }
         );

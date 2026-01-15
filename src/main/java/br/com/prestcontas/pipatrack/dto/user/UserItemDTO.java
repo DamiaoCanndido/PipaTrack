@@ -1,7 +1,6 @@
 package br.com.prestcontas.pipatrack.dto.user;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import br.com.prestcontas.pipatrack.dto.role.RoleItemDTO;
@@ -11,7 +10,7 @@ public record UserItemDTO(
     UUID userId, 
     String username, 
     String email,
-    List<RoleItemDTO> roles, 
+    RoleItemDTO role, 
     TownItemDTO town,
     LocalDateTime createdAt
 ) { }
