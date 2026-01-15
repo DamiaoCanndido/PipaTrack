@@ -57,12 +57,12 @@ public class UserController {
     }
 
     @PatchMapping("/user/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_admin')")
     public ResponseEntity<Void> updateUser(
         @PathVariable("id") UUID userId, 
-        @Valid @RequestBody UserUpdateDTO dto
+        @Valid @RequestBody UserUpdateDTO dto,
+        JwtAuthenticationToken token
     ){
-        userService.updateUser(userId, dto);
+        userService.updateUser(userId, dto, token);
         return ResponseEntity.ok().build();
     }
 

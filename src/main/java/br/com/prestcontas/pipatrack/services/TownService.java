@@ -27,7 +27,12 @@ public class TownService {
     }
 
     @Transactional(readOnly = true)
-    public TownResponseDTO getAllTowns(@RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int pageSize) {
+    public TownResponseDTO getAllTowns(
+        @RequestParam(defaultValue = "0") 
+        int page,
+        @RequestParam(defaultValue = "10") 
+        int pageSize
+    ) {
         var pageable = PageRequest.of(page, pageSize, Sort.Direction.ASC, "name");
         var townPage = townRepo.findAll(pageable);
 
@@ -57,6 +62,9 @@ public class TownService {
         town.setName(dto.name());
         town.setUf(dto.uf());
         town.setImageUrl(dto.imageUrl());
+        town.setCnpj(dto.cnpj());
+        town.setCode(dto.code());
+        
         townRepo.save(town);
     }
 
@@ -69,6 +77,12 @@ public class TownService {
         }
         if (dto.imageUrl() != null) {
             town.setImageUrl(dto.imageUrl());
+        }
+        if (dto.cnpj() != null) {
+            town.setCnpj(dto.cnpj());
+        }
+        if (dto.code() != null) {
+            town.setCode(dto.code());
         }
     }
 

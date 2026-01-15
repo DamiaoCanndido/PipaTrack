@@ -1,4 +1,4 @@
-package com.nergal.docseq;
+package com.nergal.pipatrack;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

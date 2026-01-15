@@ -66,6 +66,10 @@ public class UserService {
 
         var newRole = roleRepository.findByName(dto.role());
 
+        var me = getMe(token);
+
+        canCreate(me.getRole().getName(), dto.role());
+
         Town town = null;
 
         if (dto.townId() != null) {
@@ -167,11 +171,19 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(UUID userId, UserUpdateDTO dto){
-        var user = userRepository.findById(userId)
+    public void updateUser(UUID userId, UserUpdateDTO dto, JwtAuthenticationToken token){
+        var user = getMe(token);
+
+        var isAdmin = user.getRole().getName() == RoleEnum.admin;
+
+        var userToUpdate = userRepository.findById(userId)
             .orElseThrow(() -> new NotFoundException("User not found"));
 
-        applyUpdates(user, dto);
+        if (isAdmin || userToUpdate.getUserId().equals(UUID.fromString(token.getName()))) {
+            applyUpdates(user, dto);
+        } else {
+            throw new ForbiddenException("You do not have permission to update this user.");
+        }
 
         userRepository.save(user);
     }
@@ -197,5 +209,11 @@ public class UserService {
             .orElseThrow(
                 () -> new NotFoundException("User not found")
             );
+    }
+
+    private void canCreate(RoleEnum myRole, RoleEnum role){
+        if (myRole.equals(RoleEnum.manager) && role.equals(RoleEnum.admin)) {
+            new ForbiddenException("The manager is not allowed to create admins.");
+        }
     }
 }

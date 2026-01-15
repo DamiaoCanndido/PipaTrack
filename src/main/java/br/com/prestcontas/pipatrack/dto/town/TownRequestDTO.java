@@ -4,7 +4,9 @@ import org.hibernate.validator.constraints.br.CNPJ;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public record TownRequestDTO(
@@ -18,6 +20,10 @@ public record TownRequestDTO(
         message = "The URL must be valid."
     ) 
     @NotBlank(message = "url is required")
+    @Pattern(
+        regexp = "^https?://[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(/.*)?$", 
+        message = "The URL must be valid."
+    )
     String imageUrl, 
 
     @Size(min = 2, max = 2, message = "uf must have 2 characters")
@@ -29,6 +35,7 @@ public record TownRequestDTO(
     String cnpj,
 
     @Min(value = 1, message = "code invalid")
-    @NotBlank(message = "code is required")
+    @NotNull(message = "code is required")
+    @Positive
     Long code
 ) {}
