@@ -14,6 +14,7 @@ import br.com.prestcontas.pipatrack.dto.town.TownItemDTO;
 import br.com.prestcontas.pipatrack.dto.town.TownRequestDTO;
 import br.com.prestcontas.pipatrack.dto.town.TownUpdateDTO;
 import br.com.prestcontas.pipatrack.entities.Town;
+import br.com.prestcontas.pipatrack.exception.ConflictException;
 import br.com.prestcontas.pipatrack.exception.NotFoundException;
 import br.com.prestcontas.pipatrack.repositories.TownRepository;
 
@@ -58,6 +59,12 @@ public class TownService {
 
     @Transactional
     public void createTown(TownRequestDTO dto){
+        var townAlreadyExists = townRepo.findByCode(dto.code());
+
+        if(townAlreadyExists.isPresent()) {
+            throw new ConflictException("There is already a town with that code.");
+        }
+
         var town = new Town();
         town.setName(dto.name());
         town.setUf(dto.uf());

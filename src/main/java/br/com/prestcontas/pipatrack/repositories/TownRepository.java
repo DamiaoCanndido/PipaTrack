@@ -16,5 +16,7 @@ public interface TownRepository extends JpaRepository<Town, UUID>{
 
     Optional<Town> findByTownId(UUID townId);
 
+    Optional<Town> findByCode(Long code);
+
 }
 
